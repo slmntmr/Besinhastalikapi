@@ -1,11 +1,11 @@
 package com.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
-
 @Entity
 @Getter
 @Setter
@@ -14,19 +14,20 @@ import java.util.Set;
 public class Disease {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Otomatik artan birincil anahtar.
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true) // Ad alanı benzersiz ve boş olamaz.
+    @Column(nullable = false, unique = true)
     private String name;
 
-    private String description; // Hastalık açıklaması.
+    private String description;
 
-    @ManyToMany(cascade = CascadeType.PERSIST) // Cascade ile otomatik olarak ilişkili nesneleri kaydetme.
-    @JoinTable( // Ara tablo oluşturuluyor.
-            name = "food_disease", // Ara tablonun adı.
-            joinColumns = @JoinColumn(name = "disease_id"), // Bu tablodaki hastalık sütunu.
-            inverseJoinColumns = @JoinColumn(name = "food_id") // İlişkili besin sütunu.
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "food_disease",
+            joinColumns = @JoinColumn(name = "disease_id"),
+            inverseJoinColumns = @JoinColumn(name = "food_id")
     )
-    private Set<Food> foods = new HashSet<>(); // İlişkili besinler.
+    @JsonIgnoreProperties("diseases")
+    private Set<Food> foods = new HashSet<>();
 }

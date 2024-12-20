@@ -2,6 +2,7 @@ package com.example.service;
 
 
 
+import com.example.dto.DiseaseDTO;
 import com.example.entity.Disease;
 import com.example.entity.Food;
 import com.example.repository.FoodRepository;
@@ -9,17 +10,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-@Service // İş mantığı katmanı.
-@RequiredArgsConstructor // Final değişkenler için constructor ekler.
+@Service
+@RequiredArgsConstructor
 public class FoodService {
 
     private final FoodRepository foodRepository;
 
-    public List<Disease> getRelatedDiseases(String foodName) {
-        // Besin adına göre ilişkili hastalıkları döndürür.
+    public List<DiseaseDTO> getRelatedDiseases(String foodName) {
         Food food = foodRepository.findByName(foodName)
                 .orElseThrow(() -> new RuntimeException("Besin bulunamadı."));
-        return List.copyOf(food.getDiseases());
+        return food.getDiseases().stream()
+                .map(disease -> new DiseaseDTO(disease.getName(), disease.getDescription()))
+                .toList(); // Hastalıkları DTO'ya dönüştürerek döndür.
     }
 }
+
